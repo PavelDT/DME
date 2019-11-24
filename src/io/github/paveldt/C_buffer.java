@@ -4,51 +4,53 @@ import java.util.*;
 
 public class C_buffer {
 
-	private Vector<Object> data;
+	private Vector<NodeMetadata> buffer;
 
 
 	public C_buffer (){
-		data = new Vector<Object>();
+		buffer = new Vector<NodeMetadata>();
 	}
 
 
 	public int size(){
 
-		return data.size();
+		return buffer.size();
 	}
 
-
+	//todo -- use this to create new items in the buffer instead of doing it manually in receiver.
 	public synchronized void saveRequest (String[] r){
 
-		data.add(r[0]);
-		data.add(r[1]);
+		String ip = r[0];
+		int port = Integer.parseInt(r[1]);
+		NodeMetadata nm = new NodeMetadata(ip, port);
 	}
 
 
 	public void show(){
-
-		for (int i=0; i<data.size();i++)
-			System.out.print(" "+data.get(i)+" ");
-		System.out.println(" ");
-	}
-
-
-	public void add(Object o){
-
-		data.add(o);
-
-	}
-
-
-	synchronized public Object  get(){
-
-		Object o = null;
-
-		if (data.size() > 0){
-			o = data.get(0);
-			data.remove(0);
+		System.out.print("[");
+		for (NodeMetadata nm : buffer) {
+			System.out.print(nm.ip + ":" + nm.port + ", " );
 		}
-		return o;
+		System.out.print("]\n");
+	}
+
+
+	public void add(NodeMetadata nodeMetadata){
+		buffer.add(nodeMetadata);
+	}
+
+	/**
+	 * Fetches and removes first item from buffer
+	 */
+	synchronized public NodeMetadata get(){
+
+		NodeMetadata nodeMetadata = null;
+
+		if (buffer.size() > 0){
+			nodeMetadata = buffer.get(0);
+			buffer.remove(0);
+		}
+		return nodeMetadata;
 	}
 
 

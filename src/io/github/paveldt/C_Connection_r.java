@@ -2,6 +2,7 @@ package io.github.paveldt;
 
 import java.net.*;
 import java.io.*;
+import java.util.Arrays;
 
 
 // Reacts to a node request.
@@ -11,42 +12,47 @@ public class C_Connection_r extends Thread {
 
 	// class variables
 	C_buffer buffer;
-	Socket s;
+	Socket socket;
 	InputStream in;
 	BufferedReader bin;
 
-	public C_Connection_r(Socket s, C_buffer b) {
-		this.s = s;
-		this.buffer = b;
+	public C_Connection_r(Socket socket, C_buffer buffer) {
+		this.socket = socket;
+		this.buffer = buffer;
 	}
 
 	@Override
 	public void run() {
 
-		final int NODE = 0;
-		final int PORT = 1;
-		String[] request = new String[2];
-
-		System.out.println("C:connection IN    dealing with request from socket "+ s);
+		System.out.println("C:connection IN    dealing with request from socket "+ socket);
 		try {
 
 			// >>> read the request, i.e. node ip and port from the socket s
 			// >>> save it in a request object and save the object in the buffer (see C_buffer's methods).
 
-			in = s.getInputStream();
+			in = socket.getInputStream();
 			bin = new BufferedReader(new InputStreamReader(in));
 
-			request[NODE] = ;
-			request[PORT] = ;
+			// data sent will look like "127.0.0.1---7100"
+			// 127.0.0.1 is the ip of the node requesting the token and 7100 is the port
+			String data[] = bin.readLine().split("---");
+			// the first part of the data will be ip of the node requesting to process critical section while holding token
+			String ip = data[0];
+			// the second part of the data will be the port of the node requesting to process critical section while holding token
+			int port = Integer.parseInt(data[1]);
+			NodeMetadata nm = new NodeMetadata(ip, port);
+			// write the request to the buffer
+			buffer.add(nm);
 
 
-			s.close();
-			System.out.println("C:connection OUT    received and recorded request from "+ request[NODE]+":"+request[PORT]+ "  (socket closed)");
+			socket.close();
+			System.out.println("C:connection OUT    received and recorded request from " + nm.ip + ":" + nm.port + "  (socket closed)");
 
 
 		}
-		catch (java.io.IOException e) {
+		catch (IOException e) {
 			System.out.println(e);
+			e.printStackTrace();
 			System.exit(1);
 		}
 

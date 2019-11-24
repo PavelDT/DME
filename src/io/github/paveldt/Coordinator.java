@@ -6,7 +6,9 @@ public class Coordinator {
 
 	public static void main (String args[]){
 
-		int port = 7000;
+		int mutexPort = 7001;
+		int receiverPort = 7000;
+
 		Coordinator c = new Coordinator ();
 
 		try {
@@ -22,9 +24,22 @@ public class Coordinator {
 
 
 		// allows defining port at launch time
-		if (args.length == 1) port = Integer.parseInt(args[0]);
+		if (args.length == 1) mutexPort = Integer.parseInt(args[0]);
 
 		// Create and run a C_receiver and a C_mutex object sharing a C_buffer object
+		// Create buffer that will be shared between mutex and receiver
+		C_buffer buffer = new C_buffer();
+		// create mutex and pass in buffer
+		C_mutex mutex = new C_mutex(buffer, mutexPort);
+		// create teh receiver and pass in same buffer
+		C_receiver receiver = new C_receiver(buffer, receiverPort);
+
+		// start receiver thread
+		receiver.start();
+		System.out.println("Receiver started ");
+		// start mutex thread\
+		mutex.start();
+		System.out.println("Mutex started ");
 
 	}
 
