@@ -1,15 +1,18 @@
 package io.github.paveldt;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class C_buffer {
 
 	private Vector<NodeMetadata> highPrioBuffer;
 	private Vector<NodeMetadata> lowPrioBuffer;
+	private AtomicInteger priorityBalancer;
 
 	public C_buffer (){
 		lowPrioBuffer = new Vector<NodeMetadata>();
 		highPrioBuffer = new Vector<NodeMetadata>();
+		priorityBalancer = new AtomicInteger(0);
 	}
 
     /**
@@ -57,16 +60,31 @@ public class C_buffer {
 		// by default fetch from high priority buffer
 		boolean useHighPriority = true;
 
-		if(useHighPriority && highPrioBuffer.size() > 0){
-			nodeMetadata = highPrioBuffer.get(0);
-			highPrioBuffer.remove(0);
-		} else if (lowPrioBuffer.size() > 0){
-			nodeMetadata = lowPrioBuffer.get(0);
-			lowPrioBuffer.remove(0);
+		// check if a low priority request should be executed
+		// todo -- this can be improved by accounting for the number of node
+		//         rather than just using a hard coded 10
+		if (priorityBalancer.get() % 10 == 0 && lowPrioBuffer.size() > 0) {
+			useHighPriority = false;
+		} else if (highPrioBuffer.size() == 0 && lowPrioBuffer.size() > 0) {
+			useHighPriority = false;
 		}
 
+		if (useHighPriority) {
+			nodeMetadata = highPrioBuffer.get(0);
+			highPrioBuffer.remove(0);
+			System.out.println("Processing from HIGH priority buffer ");
+		} else {
+			nodeMetadata = lowPrioBuffer.get(0);
+			lowPrioBuffer.remove(0);
+			System.out.println("Processing from LOW priority buffer ");
+		}
+
+		// every time a request is fetched increment the balancer
+		// every 10th request should be a low priority request to prevent starvation
+		priorityBalancer.incrementAndGet();
+
 		if (nodeMetadata == null) {
-			System.out.println("Something went wrong, attempted to process requests when both queues were empty");
+			System.out.println("Something went wrong, attempted to process requests when both buffers were empty");
 			System.out.println("Exiting system ");
 			System.exit(-1);
 		}
