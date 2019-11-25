@@ -19,12 +19,15 @@ public class Coordinator {
 		}
 		catch (Exception e) {
 			System.err.println(e);
-			System.err.println("Error in corrdinator");
+			System.err.println("Error in coordinator");
 		}
 
 
 		// allows defining port at launch time
-		if (args.length == 1) mutexPort = Integer.parseInt(args[0]);
+		if (args.length == 1) {
+			// no point in trycatching this - just allow the coordinator to crash, it has not really done anything yet
+			mutexPort = Integer.parseInt(args[0]);
+		}
 
 		// Create and run a C_receiver and a C_mutex object sharing a C_buffer object
 		// Create buffer that will be shared between mutex and receiver

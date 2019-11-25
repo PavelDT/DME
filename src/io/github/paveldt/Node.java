@@ -1,34 +1,30 @@
 package io.github.paveldt;
 
+import io.github.paveldt.util.IPManager;
+
 import java.net.*;
 import java.io.*;
 import java.util.*;
 
 public class Node {
 
-	private Random ra;
-	private Socket s;
-
-	private PrintWriter pout = null;
-
 	private ServerSocket nodeTokenServer;
 	private Socket nodeTokenSocket;
 
 
-	String coordinatorIP = "127.0.0.1";
-	int coordinatorPort = 7000;
-	int coordinatorTokenReturnPort = 7001;
+	private String coordinatorIP;
+	private int coordinatorPort = 7000;
+	private int coordinatorTokenReturnPort = 7001;
 
-	String n_host = "127.0.0.1";
-	String nodeIP;
-	int nodePort;
+	private String nodeIP;
+	private int nodePort;
 	private String priority;
 
 
 
-	public Node (String nam, int port, int sec, String prio) {
+	public Node (String coordinatorIP, String nam, int port, int sec, String prio) {
 
-		ra = new Random();
+		this.coordinatorIP = coordinatorIP;
 		nodeIP = nam;
 		nodePort = port;
 		priority = prio;
@@ -131,37 +127,32 @@ public class Node {
 
 	public static void main (String args[]) {
 
-		String nodeIP = "";
-		int nodePort;
 
 		// port and millisec (average waiting time) are specific of a node
-		if ((args.length < 2) || (args.length > 3)){
-			System.out.println("Usage: Node [port number] [millisecs] [priority]");
-			System.out.println("eg: 7100 100 LOW");
+		if ((args.length < 2) || (args.length > 4)){
+			System.out.println("Usage: Node [port number] [millisecs] [priority] [coordinatorIP]");
+			System.out.println("eg1: 7100 100 LOW");
+			System.out.println("eg2: 7100 100 LOW 127.0.0.1");
 			System.exit(1);
 		}
 
 		// get the IP address and the port number of the node
-		try{
-			InetAddress inetNodeAdress =  InetAddress.getLocalHost() ;
-			nodeIP = inetNodeAdress.getHostName();
-			System.out.println ("node hostname is " + nodeIP + ":" + inetNodeAdress);
-		}
-		catch (UnknownHostException e) {
-			System.out.println(e);
-			e.printStackTrace();
-			System.exit(1);
-		}
 
-		nodePort = Integer.parseInt(args[0]);
+		String nodeIP = IPManager.getLocalIP();
+		int nodePort = Integer.parseInt(args[0]);
 		// todo -- work out what this is for.
 		int milis = Integer.parseInt(args[1]);
 
 		String prio = args[2].toUpperCase() ;
+		String coordinatorIP = "127.0.0.1";
+		if (args.length == 4) {
+			coordinatorIP = IPManager.decideCoordinatorIP(args[3]);
+		}
 
-		System.out.println ("node port is " + nodePort);
+		System.out.println ("node port is " + nodePort + " nodeIP is " + nodeIP + " coordinatorIP is " + coordinatorIP);
 
-		Node n = new Node(nodeIP, nodePort, milis, prio);
+		Node n = new Node(coordinatorIP, nodeIP, nodePort, milis, prio);
+
 	}
 
 
