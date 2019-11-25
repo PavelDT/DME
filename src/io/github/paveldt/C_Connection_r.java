@@ -33,20 +33,24 @@ public class C_Connection_r extends Thread {
 			in = socket.getInputStream();
 			bin = new BufferedReader(new InputStreamReader(in));
 
-			// data sent will look like "127.0.0.1---7100"
-			// 127.0.0.1 is the ip of the node requesting the token and 7100 is the port
+			// data sent will look like "LOW---127.0.0.1---7100"
+			// LOW (or HIGH) is the request priority
+			// 127.0.0.1 is the ip of the node requesting the token and
+			// 7100 is the port
 			String data[] = bin.readLine().split("---");
-			// the first part of the data will be ip of the node requesting to process critical section while holding token
-			String ip = data[0];
-			// the second part of the data will be the port of the node requesting to process critical section while holding token
-			int port = Integer.parseInt(data[1]);
+			// the first part indicates the priority of the request
+			String priority = data[0];
+			// the second part of the data will be ip of the node requesting to process critical section while holding token
+			String ip = data[1];
+			// the third part of the data will be the port of the node requesting to process critical section while holding token
+			int port = Integer.parseInt(data[2]);
 			NodeMetadata nm = new NodeMetadata(ip, port);
 			// write the request to the buffer
-			buffer.add(nm);
+			buffer.add(priority, nm);
 
 
 			socket.close();
-			System.out.println("C:connection OUT    received and recorded request from " + nm.ip + ":" + nm.port + "  (socket closed)");
+			System.out.println("C:connection OUT    received and recorded request from " + priority + nm.ip + ":" + nm.port + "  (socket closed)");
 
 
 		}

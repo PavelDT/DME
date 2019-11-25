@@ -22,14 +22,16 @@ public class Node {
 	String n_host = "127.0.0.1";
 	String nodeIP;
 	int nodePort;
+	private String priority;
 
 
 
-	public Node (String nam, int port, int sec) {
+	public Node (String nam, int port, int sec, String prio) {
 
 		ra = new Random();
 		nodeIP = nam;
 		nodePort = port;
+		priority = prio;
 
 		System.out.println("Node " + nodeIP + ":" + nodePort + " of DME is active ....");
 
@@ -51,7 +53,7 @@ public class Node {
 				// todo --
 				// >>>  sleep a random number of seconds linked to the initialisation sec value
 
-
+				// REQUEST TOKEN
 				// >>>
 				// **** Send to the coordinator a token request.
 				// send your ip address and port number
@@ -59,10 +61,11 @@ public class Node {
 				// writer that will send node's ip and port for a token request
 				PrintWriter pw = new PrintWriter(nodeSocket.getOutputStream(), true);
 				// send the token
-				pw.println(nodeIP + "---" + nodePort);
+				pw.println(priority + "---" + nodeIP + "---" + nodePort);
 				// close the writer
 				pw.close();
 
+				//WAIT FOR TOKEN FROM COORDINATOR
 				// >>>
 				// **** Wait for the token
 				// this is just a synchronization
@@ -92,12 +95,12 @@ public class Node {
 
 				//>>>
 				// Sleep half a second, say
-				// This is the critical session
+				// This is the critical section
 				Thread.sleep(500);
 
 
 				// >>>
-				// **** Return the token
+				// **** Return the tokenS
 				// this is just establishing a synch connection to the coordinator's ip and return port.
 				// Print suitable messages - also considering communication failures
 				Socket returnSocket = new Socket(coordinatorIP, coordinatorTokenReturnPort);
@@ -132,8 +135,9 @@ public class Node {
 		int nodePort;
 
 		// port and millisec (average waiting time) are specific of a node
-		if ((args.length < 1) || (args.length > 2)){
-			System.out.print("Usage: Node [port number] [millisecs]");
+		if ((args.length < 2) || (args.length > 3)){
+			System.out.println("Usage: Node [port number] [millisecs] [priority]");
+			System.out.println("eg: 7100 100 LOW");
 			System.exit(1);
 		}
 
@@ -143,17 +147,21 @@ public class Node {
 			nodeIP = inetNodeAdress.getHostName();
 			System.out.println ("node hostname is " + nodeIP + ":" + inetNodeAdress);
 		}
-		catch (java.net.UnknownHostException e) {
+		catch (UnknownHostException e) {
 			System.out.println(e);
+			e.printStackTrace();
 			System.exit(1);
 		}
 
 		nodePort = Integer.parseInt(args[0]);
 		// todo -- work out what this is for.
 		int milis = Integer.parseInt(args[1]);
+
+		String prio = args[2].toUpperCase() ;
+
 		System.out.println ("node port is " + nodePort);
 
-		Node n = new Node(nodeIP, nodePort, milis);
+		Node n = new Node(nodeIP, nodePort, milis, prio);
 	}
 
 
