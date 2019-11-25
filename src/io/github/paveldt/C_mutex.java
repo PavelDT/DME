@@ -45,7 +45,7 @@ public class C_mutex extends Thread {
 					// >>>  **** Granting the token
 					//
 					try {
-						// create a new socket to connect to the noe that requested a token
+						// create a new socket to connect to the node that requested a token
 						// using a new socket avoids blocking the returnSocket
 						System.out.println("Sending token to: " + nm);
 						Socket nodeSocket = new Socket(nm.ip, nm.port);
@@ -56,7 +56,7 @@ public class C_mutex extends Thread {
 						pw.close();
 					} catch (IOException e) {
 						System.out.println(e);
-						System.out.println("CRASH Mutex connecting to the node for granting the TOKEN" + e);
+						System.out.println("CRASH Mutex connecting to the node for granting the TOKEN" + e + " Node did not respond in time " + nm.ip + " " + nm.port);
 						e.printStackTrace();
 					}
 

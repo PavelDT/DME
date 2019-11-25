@@ -41,7 +41,7 @@ public class Node {
 
 
 		try{
-			// create teh server socket that is responsible for accepting token returns
+			// create the server socket that is responsible for accepting token returns
 			nodeTokenServer = new ServerSocket(nodePort);
 
 			while (true) {
@@ -67,7 +67,7 @@ public class Node {
 				// this is just a synchronization
 				// Print suitable messages
 
-				// create teh node's server socket
+				// create the node's server socket
 				while (true) {
 					nodeTokenSocket = nodeTokenServer.accept();
 					// create a reader to read the token
@@ -96,7 +96,7 @@ public class Node {
 
 
 				// >>>
-				// **** Return the tokenS
+				// **** Return the token
 				// this is just establishing a synch connection to the coordinator's ip and return port.
 				// Print suitable messages - also considering communication failures
 				Socket returnSocket = new Socket(coordinatorIP, coordinatorTokenReturnPort);

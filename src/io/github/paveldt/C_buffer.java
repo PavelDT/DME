@@ -36,8 +36,8 @@ public class C_buffer {
 
 		// cannot use a foreach loop - causes concurrent modification exception
 		System.out.println("Both buffers ");
-		System.out.println(Arrays.asList(lowPrioBuffer.toArray()));
-		System.out.println(Arrays.asList(highPrioBuffer.toArray()));
+		System.out.println("LOW " + Arrays.asList(lowPrioBuffer.toArray()));
+		System.out.println("HIGH " + Arrays.asList(highPrioBuffer.toArray()));
 	}
 
 
