@@ -4,6 +4,11 @@ import java.io.*;
 import java.net.*;
 import java.util.UUID;
 
+/**
+ * @Author Pavel Todorov - pat00045 - 2634926
+ * Sends tokens to a node once it has requested it
+ * Waits for the node to return the token
+ */
 public class C_mutex extends Thread {
 
 	C_buffer buffer;
@@ -28,6 +33,10 @@ public class C_mutex extends Thread {
 			// from where the TOKEN will be later on returned.
 			// This place the server creation outside he while loop.
 			ServerSocket returnSocket = new ServerSocket(port);
+			// enforce socket timeout in case one of the nodes dies
+			// timeout needs to be long enough to allow the Node to process its critical section and return the token
+			// timeout is 5 seconds
+			returnSocket.setSoTimeout(5000);
 
 			while (true) {
 

@@ -3,6 +3,10 @@ package io.github.paveldt;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
+/**
+ * @Author Pavel Todorov - pat00045 - 2634926
+ * Buffer holding node token requests
+ */
 public class C_buffer {
 
 	private Vector<NodeMetadata> highPrioBuffer;

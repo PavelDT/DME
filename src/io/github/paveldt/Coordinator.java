@@ -2,6 +2,10 @@ package io.github.paveldt;
 
 import java.net.*;
 
+/**
+ * @Author Pavel Todorov - pat00045 - 2634926
+ * Creates the buffer, mutex and receiver
+ */
 public class Coordinator {
 
 	public static void main (String args[]){

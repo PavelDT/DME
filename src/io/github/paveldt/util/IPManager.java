@@ -5,6 +5,10 @@ import java.net.Inet6Address;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
+/**
+ * @Author Pavel Todorov - pat00045 - 2634926
+ * Utility class for node and coordinator IP selection
+ */
 public class IPManager {
     public static String getLocalIP() {
         // innitialize to loopback address

@@ -3,6 +3,10 @@ package io.github.paveldt;
 import java.io.IOException;
 import java.net.*;
 
+/**
+ * @Author Pavel Todorov - pat00045 - 2634926
+ * Receives token requests
+ */
 public class C_receiver extends Thread {
 
 	// Buffer holding node metadata token processing requests

@@ -2,12 +2,13 @@ package io.github.paveldt;
 
 import java.net.*;
 import java.io.*;
-import java.util.Arrays;
 
 
-// Reacts to a node request.
-// Receives and records the node request in the buffer.
-//
+/**
+ * @Author Pavel Todorov - pat00045 - 2634926
+ * Reacts to a node request.
+ * Receives and records the node request in the buffer.
+ */
 public class C_Connection_r extends Thread {
 
 	// class variables

@@ -4,8 +4,11 @@ import io.github.paveldt.util.IPManager;
 
 import java.net.*;
 import java.io.*;
-import java.util.*;
 
+/**
+ * @Author Pavel Todorov - pat00045 - 2634926
+ * Exectures critical code section once it has received a token
+ */
 public class Node {
 
 	private ServerSocket nodeTokenServer;
@@ -40,83 +43,89 @@ public class Node {
 		// a TOKEN (actually just a synchronization).
 
 
-		try{
+		try {
 			// create the server socket that is responsible for accepting token returns
 			nodeTokenServer = new ServerSocket(nodePort);
+			// set a timeout for the node to receive a token
+			// this timeout needs to be long enough to allow the Node to get a token response
+			// Otherwise the node will timeout waiting for a token and the Coordinator's Mutex
+			// will try to send the token to a node that is no longer waiting for it.
+			nodeTokenServer.setSoTimeout(30000);
 
 			while (true) {
+				try {
 
-				// todo --
-				// >>>  sleep a random number of seconds linked to the initialisation sec value
+					// todo --
+					// >>>  sleep a random number of seconds linked to the initialisation sec value
 
-				// REQUEST TOKEN
-				// >>>
-				// **** Send to the coordinator a token request.
-				// send your ip address and port number
-				Socket nodeSocket = new Socket(coordinatorIP, coordinatorPort);
-				// writer that will send node's ip and port for a token request
-				PrintWriter pw = new PrintWriter(nodeSocket.getOutputStream(), true);
-				// send the token
-				pw.println(priority + "---" + nodeIP + "---" + nodePort);
-				// close the writer
-				pw.close();
+					// REQUEST TOKEN
+					// >>>
+					// **** Send to the coordinator a token request.
+					// send your ip address and port number
+					Socket nodeSocket = new Socket(coordinatorIP, coordinatorPort);
+					// writer that will send node's ip and port for a token request
+					PrintWriter pw = new PrintWriter(nodeSocket.getOutputStream(), true);
+					// send the token
+					pw.println(priority + "---" + nodeIP + "---" + nodePort);
+					// close the writer
+					pw.close();
 
-				//WAIT FOR TOKEN FROM COORDINATOR
-				// >>>
-				// **** Wait for the token
-				// this is just a synchronization
-				// Print suitable messages
+					//WAIT FOR TOKEN FROM COORDINATOR
+					// >>>
+					// **** Wait for the token
+					// this is just a synchronization
+					// Print suitable messages
 
-				// create the node's server socket
-				while (true) {
-					nodeTokenSocket = nodeTokenServer.accept();
-					// create a reader to read the token
-					BufferedReader br = new BufferedReader(new InputStreamReader(nodeTokenSocket.getInputStream()));
-					// read a single line
-					String data = br.readLine();
-					// close the reader
-					br.close();
+					// create the node's server socket
+					while (true) {
+						nodeTokenSocket = nodeTokenServer.accept();
+						// create a reader to read the token
+						BufferedReader br = new BufferedReader(new InputStreamReader(nodeTokenSocket.getInputStream()));
+						// read a single line
+						String data = br.readLine();
+						// close the reader
+						br.close();
 
-					if (data != null) {
-						System.out.println("Token received " + data);
-						// break infinate loop once the token has been received
-						break;
-					} else {
-						// todo -- this is for debugging purposes
-						System.out.println("Nothing received ");
+						if (data != null) {
+							System.out.println("Token received " + data);
+							// break infinate loop once the token has been received
+							break;
+						} else {
+							// todo -- this is for debugging purposes
+							System.out.println("Nothing received ");
+						}
 					}
+
+
+					//>>>
+					// Sleep half a second, say
+					// This is the critical section
+					System.out.println("Executing critical section ");
+					Thread.sleep(500);
+
+
+					// >>>
+					// **** Return the token
+					// this is just establishing a synch connection to the coordinator's ip and return port.
+					// Print suitable messages - also considering communication failures
+					Socket returnSocket = new Socket(coordinatorIP, coordinatorTokenReturnPort);
+					// create a writer to send the token back to the coordinator
+					PrintWriter returnWriter = new PrintWriter(returnSocket.getOutputStream(), true);
+					// send the token back
+					// mutex is waiting for "--token-returned"
+					returnWriter.println("--token-returned");
+					// close the writer
+					returnWriter.close();
+					System.out.println("Token returned ");
+				} catch (IOException e) {
+					// try to sleep for 10 seconds in case the Coordinator recoveres
+					// hitting this exception means that the Coordinator died
+					System.out.println("Timeout - Coordinator appears to be down. Sleeping for 10 seconds and retrying connection " + e.getMessage());
+					e.printStackTrace();
+					Thread.sleep(10000);
 				}
-
-
-
-				//>>>
-				// Sleep half a second, say
-				// This is the critical section
-				Thread.sleep(500);
-
-
-				// >>>
-				// **** Return the token
-				// this is just establishing a synch connection to the coordinator's ip and return port.
-				// Print suitable messages - also considering communication failures
-				Socket returnSocket = new Socket(coordinatorIP, coordinatorTokenReturnPort);
-				// create a writer to send the token back to the coordinator
-				PrintWriter returnWriter = new PrintWriter(returnSocket.getOutputStream(), true);
-				// send the token back
-				// mutex is waiting for "--token-returned"
-				returnWriter.println("--token-returned");
-				// close the writer
-				returnWriter.close();
-				System.out.println("Token returned ");
-
 			}
-
-		} catch (IOException e) {
-			System.out.println(e);
-			e.printStackTrace();
-			System.exit(1);
-
-		} catch (InterruptedException ie) {
+		} catch (Exception ie) {
 			System.out.println(ie);
 			ie.printStackTrace();
 			System.exit(1);

@@ -1,5 +1,7 @@
 package io.github.paveldt;
+
 /**
+ * @Author Pavel Todorov - pat00045 - 2634926
  * Container that holds node information and avoids type casting.
  */
 public class NodeMetadata {
