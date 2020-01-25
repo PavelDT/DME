@@ -6,8 +6,9 @@ DME is a distributed mutual-exclusion system whereby you can write to only node 
 - Self-heal critical errors - Nodes can be killed and re-join the DME system on restart.
 
 ## How to start the Coordinator:
-1 cd to the DME directory
-2 java -cp . io.github.paveldt.Coordinator
+
+1. cd to the DME directory
+2. java -cp . io.github.paveldt.Coordinator
 
 How to start a node
 1 cd to the DME directory
